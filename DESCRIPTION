@@ -1,0 +1,24 @@
+Package: ggsubplot2
+Title: Subplots: ggplots within ggplots
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Michael",
+           family = "Koohafkan",
+           role = c("aut", "cre"),
+           email = "michael.koohafkan@gmail.com")
+Description: Provides a ggplot geom for plotting plots within plots.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    ggplot2 (>= 3.3),
+    grid
+RoxygenNote: 7.0.2
+Suggests: 
+    knitr,
+    rmarkdown,
+		ggraph,
+		tidygraph,
+		dplyr,
+		purrr
+VignetteBuilder: knitr
