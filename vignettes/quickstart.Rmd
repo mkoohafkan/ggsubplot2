@@ -18,10 +18,25 @@ knitr::opts_chunk$set(
 library(dplyr)
 library(purrr)
 library(ggplot2)
+library(ggsubplot2)
+```
+
+
+```{r}
+d1 = mtcars %>%
+	group_nest(gear, cyl) %>%
+	mutate(plot = map(data,
+		~ ggplot(.x, aes(x = mpg)) +
+			geom_density() +
+			theme_bw(base_size = 4)
+	))
+
+ggplot(d1, aes(x = gear, y = cyl, plot = plot)) +
+	geom_subplot(width = 0.75, height = 0.75)
 ```
 
 ```{r}
-d = mtcars %>%
+d2 = mtcars %>%
 	group_nest(am, vs, cyl, gear) %>%
 	mutate(
 		plot = map(data,
@@ -30,17 +45,13 @@ d = mtcars %>%
 			geom_point() +
 			theme_bw(base_size = 4)
 	))
-```
 
-```{r}
-library(ggsubplot2)
-
-ggplot(d, aes(x = gear, y = cyl, plot = plot)) +
+ggplot(d2, aes(x = gear, y = cyl, plot = plot)) +
 	facet_grid(vs ~ am) +
 	geom_subplot(width = 0.75, height = 0.75)
 
 # flipping will not flip the plots
-ggplot(d, aes(x = gear, y = cyl, plot = plot)) +
+ggplot(d2, aes(x = gear, y = cyl, plot = plot)) +
 	facet_grid(vs ~ am) +
 	geom_subplot(width = 0.75, height = 0.75)
 	coord_flip()
