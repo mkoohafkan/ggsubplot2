@@ -10,6 +10,7 @@ geom_subplot(
   position = PositionIdentity,
   data = NULL,
   ...,
+  theme = NULL,
   na.rm = FALSE,
   inherit.aes = TRUE
 )
