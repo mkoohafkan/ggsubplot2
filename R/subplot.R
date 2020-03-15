@@ -4,6 +4,9 @@
 #'
 #' @param mapping requires aesthetics x, y, width, height, plot.
 #' @inheritParams ggplot2::geom_rect
+#' @param nudge_x,nudge_y Horizontal and vertical adjustment 
+#'   to nudge subplots by. Useful for offsetting plots from 
+#'   their center coordinates, particularly on discrete scales.
 #' @return a ggplot2 layer.
 #'
 #' @import ggplot2
@@ -12,6 +15,7 @@ geom_subplot = function(mapping = NULL,
   stat = StatIdentity,
   position = PositionIdentity,
   data = NULL, ...,
+	nudge_x = 0, nudge_y = 0,
 	theme = NULL, na.rm = FALSE, inherit.aes = TRUE) {
 
   layer(
@@ -21,7 +25,8 @@ geom_subplot = function(mapping = NULL,
     geom = GeomSubplot,
     position = position,
     inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, theme = theme, ...)
+		params = list(na.rm = na.rm, theme = theme,
+		  nudge_x = nudge_x, nudge_y = nudge_y, ...)
   )
 }
 
@@ -36,7 +41,8 @@ GeomSubplot = ggproto("GeomSubplot", Geom,
 		params
 	},
 
-	extra_params = c("na.rm", "orientation", "theme"),
+	extra_params = c("na.rm", "orientation", "theme", 
+	  "nudge_x", "nudge_y"),
 
 	handle_na = function(data, params) {
 		data
@@ -45,6 +51,8 @@ GeomSubplot = ggproto("GeomSubplot", Geom,
 	setup_data = function(data, params) {
 		data$flipped_aes = params$flipped_aes
 		data = flip_data(data, params$flipped_aes)
+		data$y = data$y + params$nudge_y
+		data$x = data$x + params$nudge_x
 		data$width = data$width %||% params$width
 		data$height = data$height %||% params$height
 		data = transform(data,
