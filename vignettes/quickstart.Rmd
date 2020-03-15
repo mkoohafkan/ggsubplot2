@@ -27,12 +27,27 @@ d1 = mtcars %>%
 	group_nest(gear, cyl) %>%
 	mutate(plot = map(data,
 		~ ggplot(.x, aes(x = mpg)) +
-			geom_density() +
-			theme_bw(base_size = 4)
-	))
+			geom_density()
+	)) 
+
 
 ggplot(d1, aes(x = gear, y = cyl, plot = plot)) +
 	geom_subplot(width = 0.75, height = 0.75)
+
+# use a subplot theme
+ggplot(d1, aes(x = gear, y = cyl, plot = plot)) +
+	geom_subplot(width = 0.75, height = 0.75,
+	theme = theme_bw(base_size = 8))
+
+# standardize plots
+ggplot(d1, aes(x = gear, y = cyl, plot = plot)) +
+	geom_subplot(width = 0.75, height = 0.75,
+	theme = list(
+	  theme_bw(base_size = 8),
+	  ylab(NULL),
+		ylim(c(0, 1)),
+		xlim(c(10, 35))
+	))
 ```
 
 ```{r}
@@ -42,8 +57,7 @@ d2 = mtcars %>%
 		plot = map(data,
 		~ ggplot(.x) +
 			aes(x = wt, y = mpg) +
-			geom_point() +
-			theme_bw(base_size = 4)
+			geom_point()
 	))
 
 ggplot(d2, aes(x = gear, y = cyl, plot = plot)) +
@@ -53,8 +67,33 @@ ggplot(d2, aes(x = gear, y = cyl, plot = plot)) +
 # flipping will not flip the plots
 ggplot(d2, aes(x = gear, y = cyl, plot = plot)) +
 	facet_grid(vs ~ am) +
-	geom_subplot(width = 0.75, height = 0.75)
+	geom_subplot(width = 0.75, height = 0.75,
+	  theme = theme())
 	coord_flip()
+```
+
+
+```{r}
+library(sf)
+
+nc <- st_read(system.file("shape/nc.shp", package = "sf"))
+data(Crime, package = "Ecdat")
+
+crimedat = Crime %>%
+	group_nest(county) %>%
+	mutate(plot = map(data,
+		~ ggplot(.x, aes(x = year, y = crmrte)) +
+			geom_line(color = "red")
+	))
+
+ncdat = nc %>%
+	st_transform(3857) %>%
+	bind_cols(as_tibble(st_coordinates(st_centroid(.)))) %>%
+	left_join(crimedat, by = c("CRESS_ID" = "county"))
+
+ggplot(ncdat) + geom_sf() +
+	geom_subplot(aes(x = X, y = Y, plot = plot),
+		width = 16000, height = 16000, theme = theme_void())
 ```
 
 ```{r}
@@ -70,8 +109,7 @@ g = tbl_graph(
 	mutate(plot = map(1:n(),
 			~ ggplot(tibble(x = rnorm(1000, sd = .x)),
 			  aes(x = x)) +
-				geom_histogram() +
-				theme_bw(base_size = 4)
+				geom_histogram() 
 	))
 
 
